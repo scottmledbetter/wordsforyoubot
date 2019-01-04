@@ -1,40 +1,29 @@
-var twit = require('twit');
-var fetch = require('node-fetch');
-var config = require('./config.js');
+const twit = require('twit');
+const fetch = require('node-fetch');
+const config = require('./config.js');
 
-var Twitter = new twit(config);
+const T = new twit(config);
 
-var words = "https://raw.githubusercontent.com/adambom/dictionary/master/dictionary.json";
-var messageNumber = 0;
+const words = "https://raw.githubusercontent.com/adambom/dictionary/master/dictionary.json";
+let messageNumber = 200;
 
-function getWord() {
-
+const getWord = () => {
 fetch(words)
-    .then(function (response) {
+    .then(response => {
         return response.json();
     })
-    .then(function (myJson) {
-        console.log(
-            Object.keys(myJson)[ 
-                messageNumber
-            ]
-        );
-        console.log(
-            Object.values(myJson)[ 
-                messageNumber
-            ]
-        );
+    .then(myJson => {
+        T.post('statuses/update', { 
+            status:             
+                Object.keys(myJson)[messageNumber].replace(/^\s+|\s+$/g, '') + ':' + '\n' + Object.values(myJson)[messageNumber].replace(/^\s+|\s+$/g, '')
+        }, 
+            (err, data, response) => {
+            console.log(data)
+          })
     })
-    .then(function() {
+    .then(() => {
         messageNumber ++;
     })
-
 }
 
-setInterval(getWord, 1500);
-
-    // Twitter.post('statuses/update', {
-    //     status: messages[1]
-    // }, function (err, data, response) 
-    //     console.log(data);
-    // });
+setInterval(getWord, 15000);
