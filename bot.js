@@ -26,4 +26,4 @@ fetch(words)
     })
 }
 
-setInterval(getWord, 15000);
+setInterval(getWord, 1800000);
