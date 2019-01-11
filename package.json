@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "node-fetch": "^2.3.0",
-    "twit": "^2.2.11"
+    "twit": "^2.2.11",
+    "unirest": "^0.5.1"
   }
 }

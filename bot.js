@@ -1,29 +1,54 @@
 const twit = require('twit');
 const fetch = require('node-fetch');
 const config = require('./config.js');
+const unirest = require('unirest');
 
 const T = new twit(config);
 
-const words = "https://raw.githubusercontent.com/adambom/dictionary/master/dictionary.json";
-let messageNumber = 200;
+//let messageNumber = 200;
+
+
+//setInterval(getWord, 28800000);
 
 const getWord = () => {
-fetch(words)
-    .then(response => {
-        return response.json();
+    return fetch("https://wordsapiv1.p.rapidapi.com/words/?random=true", {
+        method: "GET",
+        headers: {
+            "X-RapidAPI-Key": "60558e45bemsh0732116a6a48f93p170a98jsn8353a8fccdf1"
+        }
     })
-    .then(myJson => {
-        T.post('statuses/update', { 
-            status:             
-                Object.keys(myJson)[messageNumber].replace(/^\s+|\s+$/g, '') + ':' + '\n' + Object.values(myJson)[messageNumber].replace(/^\s+|\s+$/g, '')
-        }, 
-            (err, data, response) => {
-            console.log(data)
-          })
-    })
-    .then(() => {
-        messageNumber ++;
-    })
+        .then(response => response.json())
+        .then(json => json.word)
 }
 
-setInterval(getWord, 15000);
+const getDefinition = async () => {
+
+    let word = await getWord()
+
+    return fetch(`https://wordsapiv1.p.rapidapi.com/words/${word}/definitions`, {
+        method: "GET",
+        headers: {
+            "X-RapidAPI-Key": "60558e45bemsh0732116a6a48f93p170a98jsn8353a8fccdf1"
+        }
+    })
+        .then(response => response.json())
+        .then(json => {
+            let word = json.word;
+            let definition = json.definitions[0].definition;
+            return word + ': ' + definition;
+        })
+}
+
+const log = async () => { 
+    console.log(await getDefinition());
+}
+
+log();
+
+// T.post('statuses/update', {
+//     status:
+//         `${getWord()}`
+// },
+//     (err, data, response) => {
+//         console.log(data)
+//     })
