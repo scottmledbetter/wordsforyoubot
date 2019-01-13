@@ -1,14 +1,8 @@
 const twit = require('twit');
 const fetch = require('node-fetch');
 const config = require('./config.js');
-const unirest = require('unirest');
 
 const T = new twit(config);
-
-//let messageNumber = 200;
-
-
-//setInterval(getWord, 28800000);
 
 const getWord = () => {
     return fetch("https://wordsapiv1.p.rapidapi.com/words/?random=true", {
@@ -33,22 +27,27 @@ const getDefinition = async () => {
     })
         .then(response => response.json())
         .then(json => {
-            let word = json.word;
-            let definition = json.definitions[0].definition;
-            return word + ': ' + definition;
+            if (json.definitions.length === 0) {
+                //console.log('no def!');
+                return getDefinition();
+            } else {
+                return json.word + ': ' + json.definitions[0].definition;
+            }
         })
 }
 
-const log = async () => { 
-    console.log(await getDefinition());
+const tweetTweet = async () => {
+    const evaluatePost = await getDefinition();
+
+    T.post('statuses/update', {
+        status:
+            evaluatePost
+    },
+        (err, data, response) => {
+            console.log(data)
+        })
+
 }
 
-log();
-
-// T.post('statuses/update', {
-//     status:
-//         `${getWord()}`
-// },
-//     (err, data, response) => {
-//         console.log(data)
-//     })
+tweetTweet();
+setInterval(tweetTweet, 3600000);
