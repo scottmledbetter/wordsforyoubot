@@ -50,4 +50,4 @@ const tweetTweet = async () => {
 }
 
 tweetTweet();
-setInterval(tweetTweet, 3600000);
+setInterval(tweetTweet, 14400000);
